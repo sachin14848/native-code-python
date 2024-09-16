@@ -1,0 +1,79 @@
+version: '3.8'
+
+networks:
+  private_network:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ram
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"  # This exposes the MySQL port to your local machine
+    networks:
+      - private_network
+  eureka-server:
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - private_network
+    depends_on:
+      - api-gateway
+  api-gateway:
+    image: api-gateway-service
+    container_name: api-gateway
+    ports:
+      - "8989:8989"
+    networks:
+      - private_network
+    depends_on:
+      - mailService
+      - testService
+      - AuthenticationService
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+  mailService:
+    image: mail-service
+    networks:
+      - private_network
+    depends_on:
+      - mysql
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      DATABASE_URL: jdbc:mysql://mysql:3306/ram
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: rootpassword
+      HOST_NAME: localhost
+
+
+  testService:
+    image: test-service
+    networks:
+      - private_network
+    depends_on:
+      - mysql
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      DATABASE_URL: jdbc:mysql://mysql:3306/ram
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: rootpassword
+      HOST_NAME: localhost
+
+  AuthenticationService:
+    image: authentication-service
+    networks:
+      - private_network
+    depends_on:
+      - mysql
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      DATABASE_URL: jdbc:mysql://mysql:3306/ram
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: rootpassword
+      HOST_NAME: localhost

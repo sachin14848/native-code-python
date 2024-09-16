@@ -1,0 +1,71 @@
+server:
+  port: 8989
+
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/ }
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}
+
+
+
+
+spring:
+  application:
+    name: gateway-server
+  cloud:
+    gateway:
+      routes:
+        - id: jwt-authentication
+          uri: lb://JWTAUTHENTICATION
+          predicates:
+            - Path=/auth/**
+        - id: test-server
+          uri: lb://TEST-SERVICE
+          predicates:
+            - Path=/api/**
+        - id:
+          uri: lb://MAIL-SERVICE
+          predicates:
+            - Path=/mail/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+        #logging:
+        #  level:
+        #    org.springframework: DEBUG
+
+        #resilience4j:
+        #  circuitbreaker:
+        #    instances:
+        #      serviceACircuitBreaker:
+        #        register-health-indicator: true
+        #        failure-probability: 0.5
+        #        sliding-window-size: 10
+        #        minimum-number-of-calls: 10
+        #        wait-duration-in-seconds: 30s
+        #        waitDurationInOpenState: 30s
+
+
+
+        #          filters:
+        #            name: CircuitBreacker
+        #            args:
+        #              name: serviceBCircuitBreaker
+        #              fallBack: forward:/fallback/service-b
+        #            - StripPrefix=1
+
+        #    httpclient:
+        #      wiretap: true  #// do not use into production or read the document https://docs.spring.io/spring-cloud-gateway/reference/4.1-SNAPSHOT/appendix.html
+        #      default-filters:
+        #        - name: JwtAuthenticationFilter
+        #          args:
+        #            timeoutDuration: 20s

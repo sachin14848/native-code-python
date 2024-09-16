@@ -1,0 +1,29 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: cricket-service
+  redis:
+    host: localhost
+    port: 6379
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ram
+    username: root
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+
+
+rapid:
+  baseURL: https://cricbuzz-cricket.p.rapidapi.com/
+  urls:
+    teams: teams/v1/international
+    series: series/v1/international
+    matchDetailsUrl: series/v1/
+    leanback: mcenter/v1/

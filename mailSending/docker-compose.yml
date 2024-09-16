@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-containers
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_DATABASE: ram
+      MYSQL_USER: root
+      MYSQL_PASSWORD: yourpassword
+    ports:
+      - "3306:3306"
+    networks:
+      - springboot-network
+
+  springboot-app:
+    image: mail-service
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/your_database_name
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: yourpassword
+    ports:
+      - "8080:8080"
+    networks:
+      - springboot-network
+
+networks:
+  springboot-network:
+    driver: bridge

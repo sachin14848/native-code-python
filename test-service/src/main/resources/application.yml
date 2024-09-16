@@ -1,0 +1,41 @@
+server:
+  port: 8345
+
+jwt:
+  rsa-private-key: classpath:certs/privateKey.pem
+  rsa-public-key: classpath:certs/publicKey.pem
+
+spring:
+  application:
+    name: TEST-SERVICE
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:certs/publicKey.pem
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/ram}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:rootpasswords}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhostcl:8761/eureka/ }
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

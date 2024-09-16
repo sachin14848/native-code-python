@@ -1,0 +1,11 @@
+version: '3'
+services:
+  springboot-app:
+    image: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - my-network
+
+networks:
+  my-network:

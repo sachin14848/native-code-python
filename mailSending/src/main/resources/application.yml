@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: MAIL-SERVICE
+  rabbitmq:
+    host: 192.168.81.223
+    port: 5672
+    username: guest
+    password: guest
+    queue:
+      name: mail_queue
+    queues:
+      email_queue:
+        x-message-ttl: 6000
+    exchange:
+      name: mail_exchange
+    routingkey:
+      name: mail.routing.key
+    listener:
+      simple:
+        retry:
+          enabled: false
+        default-requeue-rejected: false
+        acknowledge-mode: manual
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sachinmishra14848@gmail.com
+    password: ogun kefo nboy zmex
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  amqp:
+    deserialization:
+      trust:
+        all: true
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/ram}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:rootpassword}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+#        transport:
+#          protocol: smtp
+
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/ }
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, into
+
+#  docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=yourpassword -p 3306:3306 -d mysql:latest

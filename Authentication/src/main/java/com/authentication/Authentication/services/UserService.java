@@ -1,7 +1,6 @@
 package com.authentication.Authentication.services;
 
 import com.authentication.Authentication.dto.user.UpdateUserDto;
-import com.authentication.Authentication.dto.user.UpdateUserDto;
 import com.authentication.Authentication.entities.UserInfoEntity;
 import com.authentication.Authentication.repo.UserInfoRepo;
 import jakarta.transaction.Transactional;

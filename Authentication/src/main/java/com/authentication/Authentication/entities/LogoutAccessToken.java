@@ -1,9 +1,6 @@
 package com.authentication.Authentication.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,8 @@ public class LogoutAccessToken {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "TOKEN", nullable = false, length = 1000, unique = false)
     private String token;
     private boolean revoked;
 

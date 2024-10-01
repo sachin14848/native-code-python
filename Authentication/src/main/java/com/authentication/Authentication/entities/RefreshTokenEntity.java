@@ -24,8 +24,12 @@ public class RefreshTokenEntity {
     @Column(name = "REVOKED")
     private boolean revoked;
 
+    private String domainName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private UserInfoEntity user;
+
+
 
 }

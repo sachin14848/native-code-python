@@ -17,6 +17,20 @@ spring:
       ddl-auto: update
       properties:
         hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+  main:
+    allow-bean-definition-overriding: true
+
+
+cloud:
+  aws:
+    s3:
+      region: us-east-1
+      auto: false
+    stack:
+      auto: false
+
+
+
 jwt:
   rsa-private-key: classpath:certs/privateKey.pem
   rsa-public-key: classpath:certs/publicKey.pem
@@ -43,3 +57,9 @@ logging:
     org:
       springframework:
         security: trace
+aws:
+  s3:
+    bucket: progrowwuserimage
+    access-key: dummy-aws-access-key
+    secret-access-key: dummy-aws-secret-access-key
+    region: us-east-1

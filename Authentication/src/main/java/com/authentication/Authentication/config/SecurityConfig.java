@@ -68,7 +68,7 @@ public class SecurityConfig {
                 .userDetailsService(userInfoManagerConfig)
                 .securityMatcher(new AntPathRequestMatcher("/auth/sign-in/**"))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/otp")
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/otp", "/auth/sign-up")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -120,7 +120,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer
                                 .decoder(jwtDecoder())
-                ))
+                ).disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtRefreshTokenFilter(jwtDecoder(), refreshTokenRepo, jwtTokenUtils), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> {
@@ -140,7 +140,10 @@ public class SecurityConfig {
                 .securityMatcher(new AntPathRequestMatcher("/auth/logout/**"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .oauth2ResourceServer(oath2 -> oath2.jwt(withDefaults()))
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwtConfigurer ->
+                        jwtConfigurer
+                                .decoder(accessTokenDecoder())
+                ))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtAccessTokenFilter(accessTokenDecoder(), jwtTokenUtils, logoutAccessTokenRepo), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
@@ -186,8 +189,7 @@ public class SecurityConfig {
     }
 
     @Bean(name = "accessTokenDecoder")
-    public JwtDecoder accessTokenDecoder() { // it is use for Access Tokens
-        // Configure JwtDecoder for access tokens
+    public JwtDecoder accessTokenDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeyRecordAccessToken.rsaPublicKey()).build();
     }
 

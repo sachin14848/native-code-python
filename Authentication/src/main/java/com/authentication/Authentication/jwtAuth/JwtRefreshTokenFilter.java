@@ -1,9 +1,11 @@
 package com.authentication.Authentication.jwtAuth;
 
+import com.authentication.Authentication.utiles.RefreshToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.authentication.Authentication.dto.ErrorResponse;
 import com.authentication.Authentication.repo.RefreshTokenRepo;
 import com.authentication.Authentication.utiles.JwtTokenUtils;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -15,15 +17,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,7 +40,6 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
     private JwtDecoder refreshTokenDecoder;
     private RefreshTokenRepo refreshTokenRepo;
     private JwtTokenUtils jwtTokenUtils;
-    private boolean isValidRefreshToken;
 
     public JwtRefreshTokenFilter(@Qualifier("refreshTokenDecoder") JwtDecoder refreshTokenDecoder, RefreshTokenRepo refreshTokenRepo, JwtTokenUtils jwtTokenUtils) {
         this.refreshTokenDecoder = refreshTokenDecoder;
@@ -49,12 +56,11 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
             final Cookie[] cookies = request.getCookies();
             String refreshToken = null;
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refresh_token")) {
+                if (cookie.getName().equals(RefreshToken.refresh_token.name())) {
                     refreshToken = cookie.getValue();
                 }
             }
             log.info("Refresh token : {}", refreshToken);
-//            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (refreshToken == null) {
                 throw new JwtException("Refresh token is required in Cookie header");
             }
@@ -62,31 +68,38 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
 
             final String userName = jwtTokenUtils.getUserName(jwtRefreshToken);
             System.out.println(userName);
-
             if (!userName.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-
                 var isRefreshTokenValidInDatabase = refreshTokenRepo.findByRefreshToken(refreshToken)
                         .map(refresh -> !refresh.isRevoked())
                         .orElseThrow(() -> new JwtException("Refresh token not found or revoked"));
                 UserDetails userDetails = jwtTokenUtils.userDetails(userName);
+                logger.info("User &&&&&&&&&&&&&&&&&&++++++++++ token: " + userDetails.getAuthorities());
+                Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+                List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authorities);
+                updatedAuthorities.add(new SimpleGrantedAuthority("SCOPE_REFRESH_TOKEN"));
                 if (jwtTokenUtils.isTokenValid(jwtRefreshToken, userDetails) && isRefreshTokenValidInDatabase) {
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                     UsernamePasswordAuthenticationToken createdToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
+                            updatedAuthorities
                     );
                     createdToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     securityContext.setAuthentication(createdToken);
                     SecurityContextHolder.setContext(securityContext);
                 }
             }
-//            filterChain.doFilter(request, response);
+        } catch (InvalidBearerTokenException ex) {
+            handleException(response, "Invalid Token", ex.getMessage());
+        } catch (BadJwtException ex) {
+            handleException(response, "Error To Decode The Token", ex.getMessage());
         } catch (JwtException ex) {
             handleException(response, "Invalid or Expiry JWT Refresh Token", ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+            handleException(response, "Token expired", ex.getMessage());
         } catch (Exception ex) {
             handleException(response, "Internal Server Error", ex.getMessage());
-        }finally {
+        } finally {
             filterChain.doFilter(request, response);
         }
 

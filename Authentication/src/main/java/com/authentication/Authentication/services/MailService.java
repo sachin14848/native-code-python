@@ -1,7 +1,6 @@
 package com.authentication.Authentication.services;
 
 import com.authentication.Authentication.dto.MailDto;
-import com.authentication.Authentication.dto.MailDto;
 import com.authentication.Authentication.entities.UserInfoEntity;
 import com.authentication.Authentication.entities.otp.Otp;
 import com.authentication.Authentication.repo.UserInfoRepo;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +40,7 @@ public class MailService {
     private static final String HMAC_ALGO = "HmacSHA256";
     private static final String SECRET_KEY = "your-secret-key";
 
-//    @Async
+    //    @Async
     public String sendEmail(@Valid MailDto mailDto, String token) {
         try {
             log.info("Sending email to: {}", mailDto.getEmailTo());
@@ -71,22 +71,18 @@ public class MailService {
 
     private void updateUserInfo(String password, String emailTo) {
 
-        UserInfoEntity userInfoEntity = userInfoRepo.findByEmailId(emailTo).orElse(null);
-        if (userInfoEntity == null) {
-            userInfoEntity = new UserInfoEntity();
-            userInfoEntity.setEmailId(emailTo);
-            userInfoEntity.setPassword(passwordEncoder.encode(password));
-            userInfoEntity.setRoles("ROLE_USER");
-            userInfoEntity.setOtpExpirationTime(Date.from(Instant.now().plus(3, ChronoUnit.MINUTES))); // Set OTP expiration time to 5 minutes from
-        } else {
+        UserInfoEntity userInfoEntity = userInfoRepo.findByEmailId(emailTo).orElseThrow(() -> new UsernameNotFoundException("Email not found"));
+        if (userInfoEntity != null) {
             userInfoEntity.setOtpExpirationTime(Date.from(Instant.now().plus(2, ChronoUnit.MINUTES))); // Set OTP expiration time to 5 minutes from
             userInfoEntity.setPassword(passwordEncoder.encode(password)); // Encode the password using the configured encoder
         }
+        assert userInfoEntity != null;
         userInfoRepo.save(userInfoEntity);// Encode the password using the configured encoder
     }
 
     private void updateOtp(String otp, String emailTo) {
-        UserInfoEntity userInfoEntity = userInfoRepo.findByEmailId(emailTo).orElse(null);
+        UserInfoEntity userInfoEntity = userInfoRepo.findByEmailId(emailTo)
+                .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
         if (userInfoEntity != null) {
             Otp otpEntity = new Otp();
             otpEntity.setOtp(otp);

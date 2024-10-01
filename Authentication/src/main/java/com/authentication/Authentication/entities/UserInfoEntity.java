@@ -29,9 +29,11 @@ public class UserInfoEntity {
     private String emailId;
 
     @Column(nullable = false, name = "PASSWORD")
+//    @Convert(converter = AttributesConvertor.class)
     private String password;
 
     @Column(name = "PHONE_NO")
+//    @Convert(converter = AttributesConvertor.class)
     private String phone;
 
     @Column(name = "OTP")

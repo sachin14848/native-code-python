@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -72,13 +73,18 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (UsernameNotFoundException e) {
             handleException(response, "Invalid JWT Token", e.getMessage());
+        } catch (InvalidBearerTokenException ex) {
+            handleException(response, "Invalid Token", ex.getMessage());
+        } catch (BadJwtException ex) {
+            handleException(response, "Error To Decode The Token", ex.getMessage());
         } catch (JwtException ex) {
-            handleException(response, "Invalid or Expiry JWT Access Token", ex.getMessage());
+            handleException(response, "Invalid or Expiry JWT Refresh Token", ex.getMessage());
         } catch (ExpiredJwtException ex) {
             handleException(response, "Token expired", ex.getMessage());
         } catch (Exception ex) {
             handleException(response, "Internal Server Error", ex.getMessage());
         }
+
     }
 
     private void handleException(HttpServletResponse response, String error, String message) throws IOException {

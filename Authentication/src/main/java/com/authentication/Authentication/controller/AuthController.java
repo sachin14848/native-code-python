@@ -1,20 +1,25 @@
 package com.authentication.Authentication.controller;
 
 import com.authentication.Authentication.dto.*;
+import com.authentication.Authentication.dto.otp.OtpResponse;
 import com.authentication.Authentication.services.AuthServices;
 import com.authentication.Authentication.services.LogoutService;
 import com.authentication.Authentication.services.MailService;
+import com.authentication.Authentication.utiles.RefreshToken;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.auth.HttpAuthenticator;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequestMapping("/auth")
 public class AuthController {
+
     private final AuthServices authService;
     private final MailService mailService;
     private final LogoutService logoutService;
@@ -39,7 +45,7 @@ public class AuthController {
         log.info("User has been authenticated: {}", request.getUsername());
         try {
             if (mailService.isValidateOtp(request.getOtp(), request.getUsername())) {
-                AuthResponseDto responseDto = authService.getJwtTokensAfterAuthentication(authentication, response);
+                AuthResponseDto responseDto = authService.getJwtTokensAfterAuthentication(authentication, response, req);
 
                 return ResponseEntity.ok(NewCommonResponse.<AuthResponseDto>builder()
                         .status("success")
@@ -73,8 +79,18 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> getAccessToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest req) {
         try {
-
-            final Object data = authService.getAccessTokenUsingRefreshToken(authorizationHeader);
+            log.info("getAccessToken");
+            final Cookie[] cookies = req.getCookies();
+            String refreshToken = null;
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(RefreshToken.refresh_token.name())) {
+                    refreshToken = cookie.getValue();
+                }
+            }
+            if (refreshToken == null) {
+                throw new Exception("Refresh token is required in Cookie header");
+            }
+            final Object data = authService.getAccessTokenUsingRefreshToken(refreshToken);
 
             return ResponseEntity.ok(NewCommonResponse.<Object>builder()
                     .status("success")
@@ -110,12 +126,13 @@ public class AuthController {
                 throw new Exception("Could not send email");
             }
 
-            return ResponseEntity.ok(NewCommonResponse.<String>builder()
+
+            return ResponseEntity.ok(NewCommonResponse.<OtpResponse>builder()
                     .status("success")
                     .success(true)
                     .message("Otp sent successfully")
                     .statusCode(HttpStatus.OK.value())
-                    .data(data)
+                    .data(OtpResponse.builder().token(data).build())
                     .path(req.getRequestURI())
                     .requestId(UUID.randomUUID().toString())
                     .error(null)
@@ -138,11 +155,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication, @RequestBody LogoutRequest logoutRequest) {
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-            logoutService.processLogout(logoutRequest); // Assuming logout method is defined in LogoutService class
-        }
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        // The part of the header value after "Bearer "
+
+        new SecurityContextLogoutHandler().logout(request, response, authentication);
+        boolean sucess = logoutService.processLogout(request, response); // Assuming logout method is defined in LogoutService class
         return ResponseEntity.ok("{\"message\":\"Logout successful\"}");
     }
 

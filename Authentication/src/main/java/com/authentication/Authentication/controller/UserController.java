@@ -1,6 +1,7 @@
 package com.authentication.Authentication.controller;
 
 import com.authentication.Authentication.dto.NewCommonResponse;
+import com.authentication.Authentication.dto.user.SignUpDto;
 import com.authentication.Authentication.dto.user.UpdateUserDto;
 import com.authentication.Authentication.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,11 +23,17 @@ public class UserController {
 
     private final UserService userService;
 
+
+    @PostMapping("/sign-up")
+
+
+
     @PreAuthorize("hasAuthority('SCOPE_READ')")
     @PutMapping("/update-user/{userId}")
     public ResponseEntity<NewCommonResponse<Boolean>> updateUser(@PathVariable int userId,
                                                                  @Valid @RequestBody UpdateUserDto updateUser,
                                                                  BindingResult result, HttpServletRequest req) {
+
         try {
             if (result.hasErrors()) {
                 throw new Exception("Error updating");

@@ -69,7 +69,7 @@ public class MatchController {
             response.setStatus(true);
             response.setMessage("Match with Series id founded");
             response.setStatusCode(HttpStatus.FOUND.value());
-            return new ResponseEntity<>(response, HttpStatus.FOUND);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
             log.info("Exception occurred while creating new {}", e.getMessage());
             response.setStatus(false);

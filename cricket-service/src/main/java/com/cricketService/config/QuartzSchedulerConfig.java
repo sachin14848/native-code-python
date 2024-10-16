@@ -14,8 +14,6 @@ public class QuartzSchedulerConfig {
 
     private final SampleJob sampleJob;
 
-
-
     @Bean
     public JobDetail sampleJobDetail() {
         return JobBuilder.newJob(SampleJob.class)

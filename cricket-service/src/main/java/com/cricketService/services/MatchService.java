@@ -6,6 +6,7 @@ import com.cricketService.dto.match.MatchInfoDto;
 import com.cricketService.dto.match.MatchRapidApi;
 import com.cricketService.entities.match.MatchInfo;
 import com.cricketService.repo.match.MatchInfoRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,20 +37,17 @@ public class MatchService {
     @Value("${rapid.urls.matchDetailsUrl}")
     private String matchDetailsUrl;
 
+    @Transactional
     public MatchRapidApi createMatch(String matchId) {
         log.info("Creating Match matchId {}", matchId);
-//        List<SeriesDto> seriesDtoList = seriesService.getAllSeries();
-//        seriesDtoList.forEach(seriesDto ->{
-//
-//        });  //8494 series id
 
-        final String url = baseUrl + matchDetailsUrl + 8494;
+        final String url = baseUrl + matchDetailsUrl + matchId;
         log.info("URL {}", url);
         MatchRapidApi seriesList = null;
         try {
             seriesList = restTemplate.getForObject(url, MatchRapidApi.class);
         } catch (ResourceAccessException e) {
-            log.error("Error fetching data from Rapid API: {}", e.getMessage(), e);
+            log.error("Error fetching data from Rapid API: {}", e.getMessage());
             return null;
         } catch (RestClientException e) {
             log.error("Error fetching 12 data from Rapid API: {}", e.getMessage(), e);
@@ -59,8 +57,6 @@ public class MatchService {
             return null;
         }
 
-//        log.info("Data : {}", seriesList);
-
         assert seriesList != null;
         seriesList.getMatchDetails().forEach(matchDetails -> {
             MatchDetailsMap matchDetailsMap = matchDetails.getMatchDetailsMap();
@@ -69,7 +65,6 @@ public class MatchService {
                 if (matches != null) {
                     matches.forEach(match -> {
                         MatchInfoDto dd = match.getMatchInfo();
-
                         MatchInfo matchInfo = MatchInfo.builder()
                                 .id((long) dd.getMatchId())
                                 .series(seriesService.getSingleSeriesSById(dd.getSeriesId()))
@@ -80,15 +75,14 @@ public class MatchService {
                                 .startDate(dd.getStartDate())
                                 .state(dd.getState())
                                 .status(dd.getStatus())
-                                .team1(teamListService.getTeams(dd.getTeam1().getTeamId()))
-                                .team2(teamListService.getTeams(dd.getTeam2().getTeamId()))
+                                .team1(teamListService.getTeams(dd.getTeam1()))
+                                .team2(teamListService.getTeams(dd.getTeam2()))
                                 .isTimeAnnounced(dd.isTimeAnnounced())
                                 .build();
                         matchInfoRepository.save(matchInfo);
                     });
                 }
             }
-
         });
 
         return seriesList;

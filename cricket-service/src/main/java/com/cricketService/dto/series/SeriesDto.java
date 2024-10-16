@@ -1,4 +1,4 @@
-package com.cricketService.dto;
+package com.cricketService.dto.series;
 
 import com.cricketService.entities.Series;
 import com.fasterxml.jackson.annotation.JsonIgnore;

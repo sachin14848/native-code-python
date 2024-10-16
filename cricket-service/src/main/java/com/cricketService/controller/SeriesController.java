@@ -1,8 +1,10 @@
 package com.cricketService.controller;
 
+
 import com.cricketService.dto.CommonResponse;
-import com.cricketService.dto.SeriesDto;
-import com.cricketService.dto.SeriesRapidDto;
+import com.cricketService.dto.series.SeriesCreateDto;
+import com.cricketService.dto.series.SeriesDto;
+import com.cricketService.dto.series.SeriesRapidDto;
 import com.cricketService.entities.SeriesWithDate;
 import com.cricketService.services.SeriesService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +22,8 @@ public class SeriesController {
     private final SeriesService seriesService;
 
     @GetMapping("/create")
-    public ResponseEntity<SeriesRapidDto> create() {
-        return ResponseEntity.ok(seriesService.createSeriesList());
+    public ResponseEntity<List<SeriesWithDate>> create(@RequestBody SeriesCreateDto seriesCreateDto) {
+        return ResponseEntity.ok(seriesService.createSeriesList(seriesCreateDto.getType()));
     }
 
     @GetMapping("/get-series")
@@ -34,8 +36,6 @@ public class SeriesController {
         CommonResponse<SeriesWithDate> response = new CommonResponse<>();
         try {
             SeriesWithDate seriesWithDate = seriesService.getSeriesWithMonthID(id);
-
-
             if (seriesWithDate == null) {
                 return ResponseEntity.notFound().build();
             }

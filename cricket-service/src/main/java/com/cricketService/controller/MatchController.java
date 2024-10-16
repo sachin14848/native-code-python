@@ -25,10 +25,10 @@ public class MatchController {
     private static final Logger log = LoggerFactory.getLogger(MatchController.class);
     private final MatchService matchService;
 
-    @GetMapping(value = "/create/matchInfo", produces = "application/json")
-    private ResponseEntity<CommonResponse<MatchRapidApi>> createMatchInfo() {
+    @GetMapping(value = "/create/matchInfo/{seriesId}", produces = "application/json")
+    private ResponseEntity<CommonResponse<MatchRapidApi>> createMatchInfo(@PathVariable String seriesId) {
         CommonResponse<MatchRapidApi> response = new CommonResponse<>();
-        MatchRapidApi match = matchService.createMatch("123");
+        MatchRapidApi match = matchService.createMatch(seriesId);
         response.setData(match);
         response.setStatus(true);
         response.setStatusCode(HttpStatus.FOUND.value());
@@ -44,9 +44,10 @@ public class MatchController {
             if (matchInfoDto == null) {
                 throw new RuntimeException("Series not found");
             }
+            log.info("MatchInfo  by series id: {}", matchInfoDto);
             response.setData(matchInfoDto);
             response.setStatus(true);
-            response.setMessage("Match with Series id founded");
+            response.setMessage("Match with Series id found");
             response.setStatusCode(HttpStatus.FOUND.value());
             return new ResponseEntity<>(response, HttpStatus.FOUND);
         } catch (RuntimeException e) {

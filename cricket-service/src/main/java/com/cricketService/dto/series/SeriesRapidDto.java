@@ -1,4 +1,4 @@
-package com.cricketService.dto;
+package com.cricketService.dto.series;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

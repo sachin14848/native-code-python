@@ -13,10 +13,10 @@ import java.util.List;
 public class AppConfig {
 
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplate() {
         RestTemplate rt = new RestTemplate();
         List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-        interceptors.add((request, body, execution) ->{
+        interceptors.add((request, body, execution) -> {
             HttpHeaders headers = request.getHeaders();
             headers.add("x-rapidapi-key", "d992bac0dbmsh14f1501e80baf93p14b1bfjsn0b4f30550721");
             headers.add("x-rapidapi-host", "cricbuzz-cricket.p.rapidapi.com");
@@ -25,5 +25,10 @@ public class AppConfig {
         rt.setInterceptors(interceptors);
         return rt;
     }
+
+//    @Bean(name = "application-api")
+//    public RestTemplate applicationApiTemplate() {
+//        return new RestTemplate();
+//    }
 
 }

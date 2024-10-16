@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface SeriesWithDateRepository extends JpaRepository<SeriesWithDate, Long> {
     Optional<SeriesWithDate> findByDate(String date);
+//    Optional<SeriesWithDate> findByUniqueField(String uniqueField);
 }

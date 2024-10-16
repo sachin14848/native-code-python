@@ -1,6 +1,5 @@
-package com.cricketService.dto;
+package com.cricketService.dto.series;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

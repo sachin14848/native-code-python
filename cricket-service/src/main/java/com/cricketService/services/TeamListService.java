@@ -3,6 +3,7 @@ package com.cricketService.services;
 import com.cricketService.dto.RapidDto;
 import com.cricketService.dto.TeamsDto;
 import com.cricketService.entities.TeamsEntity;
+import com.cricketService.enums.CricketType;
 import com.cricketService.repo.TeamsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -32,8 +34,8 @@ public class TeamListService {
     @Value("${rapid.urls.teams}")
     private String teamUrl;
 
-    public RapidDto createTeamList() {
-        final String url = baseUrl + teamUrl;
+    public RapidDto createTeamList(CricketType type) {
+        final String url = baseUrl + teamUrl + type;
         RapidDto rapidDto = null;
         try {
             rapidDto = restTemplate.getForEntity(url, RapidDto.class).getBody();
@@ -55,8 +57,19 @@ public class TeamListService {
         return teamsRepository.findByTeamId(teamId).map(TeamsDto::new).orElseThrow(() -> new RuntimeException("No such team"));
     }
 
-    public TeamsEntity getTeams(int teamId) {
-        return teamsRepository.findByTeamId(teamId).orElseThrow(() -> new RuntimeException("No such team"));
+    public TeamsEntity getTeams(TeamsDto team) {
+        Optional<TeamsEntity> teamsEntity = teamsRepository.findByTeamId(team.getTeamId());
+        if (teamsEntity.isEmpty()) {
+            TeamsEntity entity = TeamsEntity.builder()
+                    .teamId(team.getTeamId())
+                    .teamName(team.getTeamName())
+                    .teamSName(team.getTeamSName())
+                    .countryName(team.getCountryName())
+                    .build();
+            teamsRepository.save(entity);
+            return entity;
+        }
+        return teamsEntity.get();
     }
 
 }

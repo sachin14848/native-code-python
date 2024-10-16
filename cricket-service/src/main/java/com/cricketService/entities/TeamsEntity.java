@@ -5,6 +5,7 @@ import com.cricketService.entities.match.MatchInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,7 +23,7 @@ public class TeamsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "team_id")
+    @Column(name = "team_id", nullable = false)
     private int teamId;
     @Column(name = "team_name")
     private String teamName;

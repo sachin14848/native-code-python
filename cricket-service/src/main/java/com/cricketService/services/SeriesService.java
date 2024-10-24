@@ -89,8 +89,12 @@ public class SeriesService {
         return seriesRepository.findById(seriesId).map(SeriesDto::new).orElseThrow(() -> new RuntimeException("No such series"));
     }
 
+    public Boolean isSeriesSaved(Long seriesId) {
+        return seriesRepository.existsById(seriesId);
+    }
+
     public Series getSingleSeriesSById(int seriesId) {
-        return seriesRepository.findById((long) seriesId).orElseThrow(() -> new RuntimeException("No such series"));
+        return seriesRepository.findById((long) seriesId).orElseThrow(() -> new RuntimeException("No such series " + seriesId));
     }
 
     public List<SeriesDto> getAllSeries() {

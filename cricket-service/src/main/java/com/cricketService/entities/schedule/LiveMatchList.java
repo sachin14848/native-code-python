@@ -1,6 +1,6 @@
 package com.cricketService.entities.schedule;
 
-import com.cricketService.enums.CricketType;
+import com.cricketService.entities.match.MatchInfo;
 import com.cricketService.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,8 +17,9 @@ public class LiveMatchList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private Long matchId;
+    @OneToOne // CascadeType.ALL to save both entities together
+    @JoinColumn(name = "match_id", referencedColumnName = "id") // Specify foreign key
+    private MatchInfo matchId;
 
     private Long seriesId;
     private MatchType matchType;

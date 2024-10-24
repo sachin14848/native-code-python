@@ -23,7 +23,7 @@ public class TeamsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "team_id", nullable = false)
+    @Column(name = "team_id", nullable = false, unique = true)
     private int teamId;
     @Column(name = "team_name")
     private String teamName;

@@ -55,5 +55,8 @@ public class MatchInfo {
         this.team1.setTeamId(matchInfoDto.getTeam1().getTeamId());
         this.team1 = new TeamsEntity(matchInfoDto.getTeam1());
         this.team2 = new TeamsEntity(matchInfoDto.getTeam2());
+        this.isTimeAnnounced = matchInfoDto.isTimeAnnounced();
+        this.currBatTeamId = matchInfoDto.getCurrBatTeamId();
     }
+
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LiveMatchListRepo extends JpaRepository<LiveMatchList, Long> {
+    boolean existsByMatchId_Id(Long matchId);
 }

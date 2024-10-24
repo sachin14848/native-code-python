@@ -21,6 +21,5 @@ public class LiveMatchScheduleJob implements Job {
         log.info("Executing Live Match");
         final long matchId = Long.parseLong(context.getJobDetail().getKey().getName());
         liveMatchScheduleService.listLiveMatches(matchId);
-
     }
 }

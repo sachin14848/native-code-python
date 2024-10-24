@@ -1,32 +1,23 @@
-package com.cricketService.entities.schedule;
+package com.cricketService.dto.upcoming;
 
 import com.cricketService.entities.match.MatchInfo;
 import com.cricketService.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "UPCOMING_MATCH_LIST")
-public class UpcomingMatchList {
+@Builder
+public class UpComingMatchDto {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    private Long id;
-
-    @OneToOne // CascadeType.ALL to save both entities together
-    @JoinColumn(name = "match_id", referencedColumnName = "id") // Specify foreign key
-    private MatchInfo matchId;
-
+    private MatchInfo matchInfo;
     private Long seriesId;
     private MatchType matchType;
     private String seriesName;
-
     private Long startDate;
     private Long endDate;
 

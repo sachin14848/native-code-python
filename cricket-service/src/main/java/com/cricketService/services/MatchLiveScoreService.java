@@ -1,6 +1,7 @@
 package com.cricketService.services;
 
 import com.cricketService.dto.RapidApiLiveScore;
+import com.cricketService.dto.scoreBoard.RapidScoreCardDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -53,5 +54,14 @@ public class MatchLiveScoreService {
         }
 
     }
+
+    public RapidScoreCardDto getScoreScoreCard(Long matchId){
+        return RapidScoreCardDto.builder()
+                .battingTeam("test")
+                .bowlingTeam("test")
+                .build();
+    }
+
+
 
 }

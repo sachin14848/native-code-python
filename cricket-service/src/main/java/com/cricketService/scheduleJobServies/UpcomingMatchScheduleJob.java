@@ -1,6 +1,8 @@
 package com.cricketService.scheduleJobServies;
 
 import com.cricketService.dto.scheduler.MatchIdAndStartDate;
+import com.cricketService.enums.MatchStatus;
+import com.cricketService.enums.MatchType;
 import com.cricketService.services.match.UpcomingMatchService;
 import com.cricketService.services.scheduler.MatchSchedulerService;
 import lombok.RequiredArgsConstructor;
@@ -33,18 +35,17 @@ public class UpcomingMatchScheduleJob implements Job {
             final long[] now = {new Date().getTime()};
             Set<MatchIdAndStartDate> matches = upcomingMatchService.fetchUpcomingMatches();
             if (!matches.isEmpty()) {
-
                 matches.forEach(match -> {
                     try {
                         matchSchedulerService.scheduleLiveMatches(
-                                match.getMatchId().toString(), "LiveMatch", match.getStartDate(), match.getSeriesName());
+                                match.getMatchId().toString(), MatchStatus.live.name(), match.getStartDate(), match.getSeriesName());
                     } catch (SchedulerException e) {
                         throw new RuntimeException(e);
                     }
                 });
             }
         } catch (Exception e) {
-            log.error("Failed to schedule millisecond task", e);
+            log.error("Failed to schedule millisecond task {}", e.getMessage());
         }
     }
 }

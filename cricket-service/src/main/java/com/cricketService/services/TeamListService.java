@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -43,9 +45,12 @@ public class TeamListService {
             log.error("Error : {}", ex.getMessage(), ex);
         }
         assert rapidDto != null;
-        System.out.println(rapidDto.toString());
+       Set<Integer> savedMatchId = getTeams().stream().map(TeamsDto::getTeamId).collect(Collectors.toSet());
         List<TeamsEntity> teams = rapidDto.getList();
-        teamsRepository.saveAll(teams);
+        Set<TeamsEntity> teamsSet = teams.stream()
+                .filter(team -> !savedMatchId.contains(team.getTeamId()))
+                .collect(Collectors.toSet());
+        teamsRepository.saveAll(teamsSet);
         return rapidDto;
     }
 

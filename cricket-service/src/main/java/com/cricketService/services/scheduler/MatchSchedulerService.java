@@ -15,15 +15,12 @@ public class MatchSchedulerService {
     private final Scheduler scheduler;
 
     public void scheduleUpcomingMatches(String jobName, String jobGroup) throws SchedulerException {
-        JobKey jobKey = new JobKey(jobName, jobGroup);
-
-        if (scheduler.checkExists(jobKey)) {
-            System.out.println("Job already exists: " + jobKey);
+        if (isJobScheduled(jobName, jobGroup)) {
             return;
         }
 
         JobDetail jobDetail = JobBuilder.newJob(UpcomingMatchScheduleJob.class)
-                .withIdentity(jobKey)
+                .withIdentity(jobName, jobGroup)
                 .build();
 
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
@@ -35,13 +32,9 @@ public class MatchSchedulerService {
     }
 
     public void scheduleLiveMatches(String jobName, String jobGroup, long delayInMilliseconds, String des) throws SchedulerException {
-        JobKey jobKey = new JobKey(jobName, jobGroup);
-
-        if (scheduler.checkExists(jobKey)) {
-            System.out.println("Job already exists: " + jobKey);
+        if (isJobScheduled(jobName, jobGroup)) {
             return;
         }
-
         JobDetail jobDetail = JobBuilder.newJob(LiveMatchScheduleJob.class)
                 .withIdentity(jobName, jobGroup)
                 .withDescription(des)
@@ -54,6 +47,17 @@ public class MatchSchedulerService {
                         .withRepeatCount(0))
                 .build();
         scheduler.scheduleJob(jobDetail, simpleTrigger);
+    }
+
+
+    public boolean isJobScheduled(String jobName, String jobGroup) throws SchedulerException {
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+
+        if (scheduler.checkExists(jobKey)) {
+            System.out.println("Job already exists: " + jobKey);
+            return true;
+        }
+        return false;
     }
 
 }

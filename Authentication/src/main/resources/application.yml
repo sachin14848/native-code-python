@@ -9,7 +9,7 @@ spring:
   datasource:
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/ram}
     username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:} #rootpassword
+    password: root #rootpassword
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -28,8 +28,6 @@ cloud:
       auto: false
     stack:
       auto: false
-
-
 
 jwt:
   rsa-private-key: classpath:certs/privateKey.pem

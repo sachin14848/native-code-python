@@ -7,12 +7,10 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     service-url:
-      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/ }
+      defaultZone: http://localhost:8761/eureka/ # ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:
   instance:
     preferIpAddress: true
     hostname: ${HOSTNAME:localhost}
-
-
 
 
 spring:
@@ -20,6 +18,25 @@ spring:
     name: gateway-server
   cloud:
     gateway:
+      default-filters:
+        - name: DedupeResponseHeader
+          args:
+            name: Access-Control-Allow-Origin
+            strategy: RETAIN_FIRST
+      globalcors:
+        corsConfigurations:
+          '[/**]': # This will apply CORS to all routes
+            allowedOrigins: "http://127.0.0.1:5500"  # Add specific origin(s) here
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - "*"
+      #            allowCredentials: true
+      websocket:
+        enabled: true
       routes:
         - id: jwt-authentication
           uri: lb://JWTAUTHENTICATION
@@ -28,11 +45,23 @@ spring:
         - id: test-server
           uri: lb://TEST-SERVICE
           predicates:
-            - Path=/api/**
-        - id:
+            - Path=/test/**
+        - id: mail-service
           uri: lb://MAIL-SERVICE
           predicates:
             - Path=/mail/**
+        - id: cricket-service
+          uri: lb://CRICKET-SERVICE
+          predicates:
+            - Path=/live-scores/**
+        - id: webSocket-router
+          uri: lb://CRICKET-SERVICE
+          predicates:
+            - Path=/api/cricket/**
+        - id: question-service
+          uri: lb://QUESTION-GENERATOR
+          predicates:
+            - Path=/ques/**
 management:
   endpoints:
     web:

@@ -36,7 +36,6 @@ public class MatchLiveScoreService {
     }
 
     public RapidApiLiveScore getMatchLiveScore(int matchId) {
-
         try {
             RapidApiLiveScore scores = redisTemplate.opsForValue().get("leanback:" + matchId);
             if (scores != null) {
@@ -52,7 +51,6 @@ public class MatchLiveScoreService {
             log.error("Error fetching live score: {}", e.getMessage());
             return null;
         }
-
     }
 
     public RapidScoreCardDto getScoreScoreCard(Long matchId){

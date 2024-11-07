@@ -6,12 +6,14 @@ import com.question_generator.services.CricketQuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,22 +37,20 @@ public class QGeneratorController {
             response.setStatusCode(HttpStatus.CREATED.value());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (BadRequestException ex) {
-            FieldError fieldError = result.getFieldError();
+            List<String> error = result.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
             response.setSuccess(false);
-            response.setError("Bad request");
-            if (fieldError != null) {
-                response.setMessage(fieldError.getDefaultMessage());
-            } else {
-                response.setMessage("Unknown error");
-            }
+            response.setError(error);
+            response.setMessage("Bad request");
             response.setData(null);
             response.setStatusCode(HttpStatus.BAD_REQUEST.value());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            List<String> errorMessages = new ArrayList<>();
+            errorMessages.add(e.getMessage());
             response.setData(null);
             response.setSuccess(false);
-            response.setError("Internal Server Error");
-            response.setMessage(e.getMessage());
+            response.setError(errorMessages);
+            response.setMessage("Internal Server Error");
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -67,8 +67,10 @@ public class QGeneratorController {
             response.setStatusCode(HttpStatus.OK.value());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
+            List<String> errorMessages = new ArrayList<>();
+            errorMessages.add(e.getMessage());
             response.setData(null);
-            response.setError(e.getMessage());
+            response.setError(errorMessages);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }

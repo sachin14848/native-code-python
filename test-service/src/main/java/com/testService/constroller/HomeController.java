@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/test")
 public class HomeController {
 
     @Autowired

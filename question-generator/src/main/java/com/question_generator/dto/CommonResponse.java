@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class CommonResponse<T> {
     private String message;
     private boolean success;
     private int statusCode;
-    private String  error;
+    private List<String> error;
     private T data;
 
 

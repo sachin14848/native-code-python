@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -17,9 +19,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CommonResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-
+        List<String> message = new ArrayList<>();
+        message.add(ex.getMessage());
         CommonResponse<?> response = CommonResponse.<Map<String, String>>builder().data(null)
-                .error(ex.getMessage())
+                .error(message)
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message("Bad Request")
                 .build();

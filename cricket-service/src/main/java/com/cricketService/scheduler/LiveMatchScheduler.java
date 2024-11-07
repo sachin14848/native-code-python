@@ -56,6 +56,7 @@ public class LiveMatchScheduler {
         log.info("Resume Job the job to the scheduler");
         JobKey jobKey = new JobKey(jobName, JOB_GROUP);
         if (scheduler.checkExists(jobKey)) {
+            log.info("Resume Job the job to the scheduler live");
             scheduler.resumeJob(jobKey);
         }
     }

@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: question-generator
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
   datasource:
     url: jdbc:mysql://localhost:3306/ram
@@ -21,3 +26,18 @@ spring:
       enabled: true
     livereload:
       enabled: true
+
+
+jwt:
+  rsa-private-key: classpath:certs/privateKey.pem
+  rsa-public-key: classpath:certs/publicKey.pem
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ # ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}

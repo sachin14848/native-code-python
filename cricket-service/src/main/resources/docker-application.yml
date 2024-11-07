@@ -29,3 +29,17 @@ rapid:
     series: series/v1/international
     matchDetailsUrl: series/v1/
     leanback: mcenter/v1/
+
+jwt:
+  rsa-private-key: classpath:certs/privateKey.pem
+  rsa-public-key: classpath:certs/publicKey.pem
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhostcl:8761/eureka/ }
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}

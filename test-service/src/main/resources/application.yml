@@ -1,9 +1,6 @@
 server:
   port: 8345
 
-jwt:
-  rsa-private-key: classpath:certs/privateKey.pem
-  rsa-public-key: classpath:certs/publicKey.pem
 
 spring:
   application:
@@ -16,7 +13,7 @@ spring:
   datasource:
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/ram}
     username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:rootpasswords}
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -24,12 +21,16 @@ spring:
       ddl-auto: update
 
 
+jwt:
+  rsa-private-key: classpath:certs/privateKey.pem
+  rsa-public-key: classpath:certs/publicKey.pem
+
 eureka:
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    registerWithEureka: true
+    fetchRegistry: true
     service-url:
-      defaultZone: ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhostcl:8761/eureka/ }
+      defaultZone: http://localhost:8761/eureka/ # ${ EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:
   instance:
     preferIpAddress: true
     hostname: ${HOSTNAME:localhost}

@@ -2,8 +2,10 @@ package com.cricketService.controller;
 
 import com.cricketService.dto.CommonResponse;
 import com.cricketService.dto.RapidApiLiveScore;
+import com.cricketService.dto.ScoreDto;
 import com.cricketService.dto.scoreBoard.RapidScoreCardDto;
 import com.cricketService.services.MatchLiveScoreService;
+import com.cricketService.services.scoreCard.ScoreCardService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import java.util.concurrent.Executors;
 public class MatchLiveScoreController {
 
     private final MatchLiveScoreService matchLiveScoreService;
+    private final ScoreCardService scoreCardService;
 
     @RequestMapping("/{matchId}")
     public ResponseEntity<CommonResponse<RapidApiLiveScore>> getLiveScore(@PathVariable int matchId) {
@@ -54,6 +57,17 @@ public class MatchLiveScoreController {
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
                                 new RuntimeException("Retries exhausted")));
     }
+
+    @GetMapping("/live/score/{matchId}")
+    public ResponseEntity<CommonResponse<ScoreDto>> getLiveScoreByScoreCard(@PathVariable String  matchId) {
+        CommonResponse<ScoreDto> response = new CommonResponse<>();
+        response.setData(scoreCardService.getMatchLiveScore(matchId));
+        response.setStatusCode(HttpServletResponse.SC_OK);
+        response.setStatus(true);
+        response.setMessage("Live score fetched successfully");
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping(value = "/live-cricket-score/new/{matchId}", produces = "text/event-stream")
     public SseEmitter streamLiveScore(@PathVariable Long matchId) {

@@ -31,26 +31,31 @@ public class LiveMatchSessionTracker {
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String sessionId = headerAccessor.getSessionId();
+        log.info("Session ID : {}", sessionId);
+        String matchIdStr = headerAccessor.getFirstNativeHeader("matchId");
         try {
-            String sessionId = headerAccessor.getSessionId();
-            log.info("Session ID : {}", sessionId);
-            String matchIdStr = headerAccessor.getFirstNativeHeader("matchId");
             assert matchIdStr != null;
             Long matchId = Long.parseLong(matchIdStr);
             log.info("match Id : {}", matchId);
             long activeUserCount = activeUserService.countActiveUsersByEventId(matchIdStr);
+            log.info("Active User Count : {}", activeUserCount);
             if (activeUserCount == 0) {
+                log.info("No user Active The Live Match");
                 if (liveMatchScheduleService.checkIfMatchExistsById(matchId)) {
+                    log.info("Match Is Exist By Match Id");
                     activeUserService.saveActiveUser(sessionId, matchIdStr);
-                    liveScoreJobScheduler.scheduleLiveMatches(matchId.toString(), "This Match Is Live");
+                    liveScoreJobScheduler.scheduleLiveMatches(matchIdStr, "This Match Is Live" + matchIdStr);
                     activeUserService.saveActiveUser("test_" + matchId, matchIdStr);
                 } else {
                     throw new IllegalStateException("No Such Match are Live");
                 }
             } else if (activeUserCount == 1) {
+                log.info("One User is Active");
                 activeUserService.saveActiveUser(sessionId, matchIdStr);
                 liveScoreJobScheduler.resumeJob(matchIdStr);
             } else {
+                log.info("Multiple Users are Active");
                 if (liveScoreJobScheduler.isJobPaused(matchIdStr)) {
                     liveScoreJobScheduler.resumeJob(matchIdStr);
                 }

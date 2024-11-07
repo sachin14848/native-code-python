@@ -105,7 +105,6 @@ public class UpcomingMatchService {
                                     } catch (SchedulerException e) {
                                         throw new RuntimeException(e);
                                     }
-
                                 }
                             });
                         }

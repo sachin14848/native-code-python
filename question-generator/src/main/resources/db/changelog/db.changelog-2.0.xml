@@ -1,0 +1,15 @@
+<!--<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"-->
+<!--                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-->
+<!--                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">-->
+
+<!--    <changeSet id="3" author="sachin">-->
+<!--&lt;!&ndash;        <dropForeignKeyConstraint baseTableName="questions" constraintName="FKdggu9uxwm71ec1gsr8q725w5g"/>&ndash;&gt;-->
+<!--&lt;!&ndash;        <dropColumn tableName="questions" columnName="event_id"/>&ndash;&gt;-->
+<!--&lt;!&ndash;        <dropColumn tableName="questions" columnName="outcome_name"/>&ndash;&gt;-->
+<!--        <dropColumn tableName="questions" columnName="no_id"/>-->
+<!--        <dropColumn tableName="questions" columnName="no_outcome_name"/>-->
+<!--        <dropColumn tableName="questions" columnName="yes_id"/>-->
+<!--        <dropColumn tableName="questions" columnName="yes_outcome_name"/>-->
+<!--    </changeSet>-->
+<!--</databaseChangeLog>-->
